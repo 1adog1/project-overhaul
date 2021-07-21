@@ -28,6 +28,7 @@
     $dependencyManager->register("Page Has Model", $pageHandler->hasModel());
     $dependencyManager->register("Page Has Controller", $pageHandler->hasController());
     $dependencyManager->register("Page Has API", $pageHandler->hasAPI());
+    $dependencyManager->register("CSRF Token", $userAuthorization->getCSRFToken());
     $dependencyManager->register("Login Status", $userAuthorization->getLoginStatus());
     $dependencyManager->register("Access Roles", $userAuthorization->getAccessRoles());
     $dependencyManager->register("Character Stats", $userAuthorization->getCharacterStats());

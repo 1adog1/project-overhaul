@@ -25,6 +25,7 @@
             $this->navArray = $this->dependencies->get("Nav Links");
             $this->pageLink = $this->dependencies->get("Page Link");
             $this->pageCode = $this->dependencies->get("Page Code");
+            $this->csrfToken = $this->dependencies->get("CSRF Token");
             $this->loginStatus = $this->dependencies->get("Login Status");
             $this->characterStats = $this->dependencies->get("Character Stats");
             
@@ -50,8 +51,17 @@
             
             if ($this->hasAPI === true) {
                 
-                $apiClassName = "\\Ridley\\Apis\\" . $this->pageCode . "\\Api";
-                $this->pageAPI = new $apiClassName($this->dependencies);
+                if (isset($_SERVER["HTTP_CSRF_TOKEN"]) and $_SERVER["HTTP_CSRF_TOKEN"] === $this->csrfToken) {
+                
+                    $apiClassName = "\\Ridley\\Apis\\" . $this->pageCode . "\\Api";
+                    $this->pageAPI = new $apiClassName($this->dependencies);
+                    
+                }
+                else {
+                    
+                    header($_SERVER["SERVER_PROTOCOL"] . " 403 Forbidden");
+                    
+                }
             
             }
             else {
@@ -86,6 +96,16 @@
             $this->pageView = new $pageClassName($this->dependencies);
             
             require __DIR__ . "/../Site/SiteBase.php";
+            
+        }
+        
+        public function renderCSRFToken() {
+            
+            ?>
+            
+            <meta name="csrftoken" content="<?php echo $this->csrfToken ?>">
+            
+            <?php
             
         }
         

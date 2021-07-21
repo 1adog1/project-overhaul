@@ -14,6 +14,7 @@
         
         private $accessRoles = [];
         private $isLoggedIn = false;
+        private $csrfToken;
         private $characterStats = [];
         
         public function __construct(
@@ -296,6 +297,7 @@
                     
                     if (time() < $sessionData["expiration"]) {
                     
+                        $this->csrfToken = $sessionData["csrftoken"];
                         $this->isLoggedIn = boolval($sessionData["isloggedin"]);
                         
                         if ($this->isLoggedIn) {
@@ -345,6 +347,8 @@
             
 			$sessionBytes = random_bytes(64);
 			$SessionID = bin2hex($sessionBytes);
+            $csrfBytes = random_bytes(16);
+            $this->csrfToken = bin2hex($csrfBytes);
 			$sessionExpiration = time() + $this->authorizationVariables["Session Time"];
 			setcookie($this->cookieName, $SessionID, ["expires" => $sessionExpiration, "path"=> "/", "samesite" => "Lax"]);
             
@@ -376,13 +380,14 @@
             
             $sessionRecheck = time() + $this->authorizationVariables["Auth Cache Time"];
 			
-			$insertSession = $this->authorizationConnection->prepare("INSERT INTO sessions (id, isloggedin, accessroles, characterid, charactername, currentpage, expiration, recheck) VALUES (:id, :isloggedin, :accessroles, :characterid, :charactername, :currentpage, :expiration, :recheck)");
+			$insertSession = $this->authorizationConnection->prepare("INSERT INTO sessions (id, isloggedin, accessroles, characterid, charactername, currentpage, csrftoken, expiration, recheck) VALUES (:id, :isloggedin, :accessroles, :characterid, :charactername, :currentpage, :csrftoken, :expiration, :recheck)");
 			$insertSession->bindParam(":id", $SessionID);
 			$insertSession->bindParam(":isloggedin", $convertedLoginStatus);
 			$insertSession->bindParam(":accessroles", $convertedAccessRoles);
 			$insertSession->bindParam(":characterid", $convertedCharacterID);
 			$insertSession->bindParam(":charactername", $convertedCharacterName);
 			$insertSession->bindParam(":currentpage", $nullValue);
+            $insertSession->bindParam(":csrftoken", $this->csrfToken);
 			$insertSession->bindParam(":expiration", $sessionExpiration);
 			$insertSession->bindParam(":recheck", $sessionRecheck);
 
@@ -420,6 +425,12 @@
                 $changeSession->execute();
             
             }
+            
+        }
+        
+        public function getCSRFToken() {
+            
+            return $this->csrfToken;
             
         }
         

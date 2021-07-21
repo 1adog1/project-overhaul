@@ -47,6 +47,7 @@
                     ["Name" => "characterid", "Type" => "TEXT"],
                     ["Name" => "charactername", "Type" => "TEXT"],
                     ["Name" => "currentpage", "Type" => "TEXT"],
+                    ["Name" => "csrftoken", "Type" => "TEXT"],
                     ["Name" => "expiration", "Type" => "BIGINT"],
                     ["Name" => "recheck", "Type" => "BIGINT"]
                 ]
