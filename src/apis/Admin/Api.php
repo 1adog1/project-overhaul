@@ -8,6 +8,7 @@
         private $databaseConnection;
         private $logger;
         private $configVariables;
+        private $esiHandler;
         
         public function __construct(
             private \Ridley\Core\Dependencies\DependencyManager $dependencies
@@ -16,6 +17,8 @@
             $this->databaseConnection = $this->dependencies->get("Database");
             $this->logger = $this->dependencies->get("Logging");
             $this->configVariables = $this->dependencies->get("Configuration Variables");
+            
+            $this->esiHandler = new \Ridley\Objects\ESI\Handler($this->databaseConnection);
             
             require __DIR__ . "/../../registers/accessRoles.php";
             
@@ -99,31 +102,11 @@
         
         private function checkEntityExists($type, $id, $name) {
             
-            $namesURL = "https://esi.evetech.net/latest/universe/names/?datasource=tranquility";
+            $namesCall = $this->esiHandler->call(endpoint: "/universe/names/", ids: [$id], retries: 1);
             
-            $namesOptions = [
-                "http" => [
-                    "ignore_errors" => true, 
-                    "header" => [
-                        "Content-Type: application/json",
-                        "accept: application/json"
-                    ],
-                    "method" => "POST",
-                    "content" => json_encode([$id])
-                ]
-            ];
-            
-            $namesContext = stream_context_create($namesOptions);
-            
-            $namesResponse = file_get_contents($namesURL, false, $namesContext);
-            
-            $namesStatusData = $http_response_header[0];
-            
-            if (str_contains($namesStatusData, "200")) {
-            
-                $namesResponseData = json_decode($namesResponse, true);
+            if ($namesCall["Success"]) {
                 
-                foreach ($namesResponseData as $eachName) {
+                foreach ($namesCall["Data"] as $eachName) {
                     
                     if ($eachName["category"] === strtolower($type) and $eachName["id"] === (int)$id and $eachName["name"] === htmlspecialchars_decode($name)) {
                         
@@ -146,33 +129,11 @@
         
         private function getNamesFromIDs($ids, $type) {
             
-            $nameCombinations = [];
+            $namesCall = $this->esiHandler->call(endpoint: "/universe/names/", ids: $ids, retries: 1);
             
-            $namesURL = "https://esi.evetech.net/latest/universe/names/?datasource=tranquility";
-            
-            $namesOptions = [
-                "http" => [
-                    "ignore_errors" => true, 
-                    "header" => [
-                        "Content-Type: application/json",
-                        "accept: application/json"
-                    ],
-                    "method" => "POST",
-                    "content" => json_encode($ids)
-                ]
-            ];
-            
-            $namesContext = stream_context_create($namesOptions);
-            
-            $namesResponse = file_get_contents($namesURL, false, $namesContext);
-            
-            $namesStatusData = $http_response_header[0];
-            
-            if (str_contains($namesStatusData, "200")) {
-            
-                $namesResponseData = json_decode($namesResponse, true);
+            if ($namesCall["Success"]) {
                 
-                foreach ($namesResponseData as $eachName) {
+                foreach ($namesCall["Data"] as $eachName) {
                     
                     if ($eachName["category"] == $type) {
                         
@@ -200,20 +161,14 @@
             if (in_array($type, $approvedTypes)) {
                 
                 if ($term !== "") {
-            
-                    $searchURL = "https://esi.evetech.net/latest/search/?categories=" . urlencode(strtolower($type)) . "&datasource=tranquility&language=en&search=" . urlencode($term) . "&strict=" . $strict;
                     
-                    $searchResponse = file_get_contents($searchURL);
+                    $searchCall = $this->esiHandler->call(endpoint: "/search/", categories: [strtolower($type)], search: $term, strict: $strict, retries: 1);
                     
-                    $searchStatusData = $http_response_header[0];
-                    
-                    if (str_contains($searchStatusData, "200")) {
+                    if ($searchCall["Success"]) {
                         
-                        $searchData = json_decode($searchResponse, true);
-                        
-                        if (!empty($searchData)) {
+                        if (!empty($searchCall["Data"])) {
                             
-                            $combinedData = $this->getNamesFromIDs(array_slice($searchData[strtolower($type)], 0, 1000), strtolower($type));
+                            $combinedData = $this->getNamesFromIDs(array_slice($searchCall["Data"][strtolower($type)], 0, 1000), strtolower($type));
                             
                             if ($combinedData !== false) {
                                 

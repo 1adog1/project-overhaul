@@ -16,12 +16,15 @@
         private $isLoggedIn = false;
         private $csrfToken;
         private $characterStats = [];
+        protected $esiHandler;
         
         public function __construct(
             protected $authorizationLogger, 
             protected $authorizationConnection, 
             protected $authorizationVariables
         ) {
+            
+            $this->esiHandler = new \Ridley\Objects\ESI\Handler($authorizationConnection);
             
             $this->cookieName = $authorizationVariables["Auth Cookie Name"];
             
@@ -130,141 +133,67 @@
             
             $idsToConvert = [];
             
-            $affiliationSuccess = false;
-            $affiliationCounter = 0;
+            $affiliationsCall = $this->esiHandler->call(endpoint: "/characters/affiliation/", characters: [$characterID], retries: 5);
             
-            while (!$affiliationSuccess and $affiliationCounter < 5) {
-            
-                $affiliationURL = "https://esi.evetech.net/latest/characters/affiliation/?datasource=tranquility";
+            if ($affiliationsCall["Success"]) {
                 
-                $affiliationOptions = [
-                    "http" => [
-                        "ignore_errors" => true, 
-                        "header" => [
-                            "Content-Type: application/json",
-                            "accept: application/json"
-                        ],
-                        "method" => "POST",
-                        "content" => json_encode([$characterID])
-                    ]
-                ];
-                
-                $affiliationContext = stream_context_create($affiliationOptions);
-                
-                $affiliationResponse = file_get_contents($affiliationURL, false, $affiliationContext);
-                
-                $affiliationStatusData = $http_response_header[0];
-                
-                if (str_contains($affiliationStatusData, "200")) {
-                
-                    $affiliationResponseData = json_decode($affiliationResponse, true);
+                foreach ($affiliationsCall["Data"] as $eachAffiliation) {
                     
-                    foreach ($affiliationResponseData as $eachAffiliation) {
+                    foreach ($eachAffiliation as $entityType => $entityID) {
                         
-                        foreach ($eachAffiliation as $entityType => $entityID) {
+                        if ($entityType == "character_id") {
                             
-                            if ($entityType == "character_id") {
-                                
-                                $this->characterStats["Character ID"] = $entityID;
-                                $idsToConvert[] = $entityID;
-                            }
-                            if ($entityType == "corporation_id") {
-                                
-                                $this->characterStats["Corporation ID"] = $entityID;
-                                $idsToConvert[] = $entityID;
-                            }
-                            if ($entityType == "alliance_id") {
-                                
-                                $this->characterStats["Alliance ID"] = $entityID;
-                                $idsToConvert[] = $entityID;
-                            }
+                            $this->characterStats["Character ID"] = $entityID;
+                            $idsToConvert[] = $entityID;
+                        }
+                        if ($entityType == "corporation_id") {
                             
+                            $this->characterStats["Corporation ID"] = $entityID;
+                            $idsToConvert[] = $entityID;
+                        }
+                        if ($entityType == "alliance_id") {
+                            
+                            $this->characterStats["Alliance ID"] = $entityID;
+                            $idsToConvert[] = $entityID;
                         }
                         
                     }
                     
-                    $affiliationSuccess = true;
-                
-                }
-                else {
-                    
-                    $affiliationSuccess = false;
-                    
                 }
                 
-                $affiliationCounter++;
-            
             }
-            
-            if (!$affiliationSuccess) {
+            else{
                 
                 trigger_error("Affiliations call failed while building character stats.", E_USER_ERROR);
                 
             }
             
-            $nameSuccess = false;
-            $nameCounter = 0;
+            $namesCall = $this->esiHandler->call(endpoint: "/universe/names/", ids: $idsToConvert, retries: 5);
             
-            while (!$nameSuccess and $nameCounter < 5) {
-            
-                $namesURL = "https://esi.evetech.net/latest/universe/names/?datasource=tranquility";
+            if ($namesCall["Success"]) {
                 
-                $namesOptions = [
-                    "http" => [
-                        "ignore_errors" => true, 
-                        "header" => [
-                            "Content-Type: application/json",
-                            "accept: application/json"
-                        ],
-                        "method" => "POST",
-                        "content" => json_encode($idsToConvert)
-                    ]
-                ];
-                
-                $namesContext = stream_context_create($namesOptions);
-                
-                $namesResponse = file_get_contents($namesURL, false, $namesContext);
-                
-                $namesStatusData = $http_response_header[0];
-                
-                if (str_contains($namesStatusData, "200")) {
-                
-                    $namesResponseData = json_decode($namesResponse, true);
+                foreach ($namesCall["Data"] as $eachName) {
                     
-                    foreach ($namesResponseData as $eachName) {
+                    if ($eachName["category"] == "character") {
                         
-                        if ($eachName["category"] == "character") {
-                            
-                            $this->characterStats["Character Name"] = htmlspecialchars($eachName["name"]);
-                            
-                        }
-                        if ($eachName["category"] == "corporation") {
-                            
-                            $this->characterStats["Corporation Name"] = htmlspecialchars($eachName["name"]);
-                            
-                        }
-                        if ($eachName["category"] == "alliance") {
-                            
-                            $this->characterStats["Alliance Name"] = htmlspecialchars($eachName["name"]);
-                            
-                        }
+                        $this->characterStats["Character Name"] = htmlspecialchars($eachName["name"]);
+                        
+                    }
+                    if ($eachName["category"] == "corporation") {
+                        
+                        $this->characterStats["Corporation Name"] = htmlspecialchars($eachName["name"]);
+                        
+                    }
+                    if ($eachName["category"] == "alliance") {
+                        
+                        $this->characterStats["Alliance Name"] = htmlspecialchars($eachName["name"]);
                         
                     }
                     
-                    $nameSuccess = true;
-                
-                }
-                else {
-                    
-                    $nameSuccess = false;
-                    
                 }
                 
-                $nameCounter++;
-            
             }
-            
-            if (!$nameSuccess) {
+            else {
                 
                 trigger_error("Names call failed while building character stats.", E_USER_ERROR);
                 

@@ -10,11 +10,15 @@
 
     class AuthBase {
         
+        protected $esiHandler;
+        
         public function __construct(
             protected $authorizationLogger, 
             protected $authorizationConnection, 
             protected $authorizationVariables
         ) {
+            
+            $this->esiHandler = new \Ridley\Objects\ESI\Handler($authorizationConnection);
             
             $this->cleanupLogins();
             
@@ -123,30 +127,11 @@
         
         private function confirmCharacterID($characterID, $characterName) {
             
-            $namesURL = "https://esi.evetech.net/latest/universe/names/?datasource=tranquility";
+            $namesCall = $this->esiHandler->call(endpoint: "/universe/names/", ids: [$characterID], retries: 1);
             
-            $namesOptions = [
-                "http" => [
-                    "header" => [
-                        "Content-Type: application/json",
-                        "accept: application/json"
-                    ],
-                    "method" => "POST",
-                    "content" => json_encode([$characterID])
-                ]
-            ];
-            
-            $namesContext = stream_context_create($namesOptions);
-            
-            $namesResponse = @file_get_contents($namesURL, false, $namesContext);
-            
-            $namesStatusData = $http_response_header[0];
-            
-            if (str_contains($namesStatusData, "200")) {
-            
-                $namesResponseData = json_decode($namesResponse, true);
+            if ($namesCall["Success"]) {
                 
-                foreach ($namesResponseData as $eachName) {
+                foreach ($namesCall["Data"] as $eachName) {
                     
                     if ($eachName["category"] == "character" and $eachName["name"] == $characterName) {
                         

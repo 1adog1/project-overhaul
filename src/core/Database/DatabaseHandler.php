@@ -10,57 +10,66 @@
             [
                 "Name" => "logs",
                 "Columns" => [
-                    ["Name" => "id", "Type" => "BIGINT", "Special" => "primary key AUTO_INCREMENT"],
-                    ["Name" => "timestamp", "Type" => "BIGINT"],
-                    ["Name" => "type", "Type" => "TEXT"],
-                    ["Name" => "page", "Type" => "TEXT"],
-                    ["Name" => "actor", "Type" => "TEXT"],
-                    ["Name" => "details", "Type" => "LONGTEXT"],
-                    ["Name" => "trueip", "Type" => "TEXT"],
-                    ["Name" => "forwardip", "Type" => "TEXT"],
+                    ["Name" => "id", "Type" => "BIGINT", "Special" => "primary key AUTO_INCREMENT"], 
+                    ["Name" => "timestamp", "Type" => "BIGINT"], 
+                    ["Name" => "type", "Type" => "TEXT"], 
+                    ["Name" => "page", "Type" => "TEXT"], 
+                    ["Name" => "actor", "Type" => "TEXT"], 
+                    ["Name" => "details", "Type" => "LONGTEXT"], 
+                    ["Name" => "trueip", "Type" => "TEXT"], 
+                    ["Name" => "forwardip", "Type" => "TEXT"]
                 ]
             ],
             [
                 "Name" => "access",
                 "Columns" => [
-                    ["Name" => "type", "Type" => "TEXT"],
-                    ["Name" => "id", "Type" => "BIGINT"],
-                    ["Name" => "name", "Type" => "TEXT"],
+                    ["Name" => "type", "Type" => "TEXT"], 
+                    ["Name" => "id", "Type" => "BIGINT"], 
+                    ["Name" => "name", "Type" => "TEXT"], 
                     ["Name" => "roles", "Type" => "TEXT"]
                 ]
             ],
             [
                 "Name" => "logins",
                 "Columns" => [
-                    ["Name" => "type", "Type" => "TEXT"],
-                    ["Name" => "state", "Type" => "TEXT"],
-                    ["Name" => "scopes", "Type" => "TEXT"],
+                    ["Name" => "type", "Type" => "TEXT"], 
+                    ["Name" => "state", "Type" => "TEXT"], 
+                    ["Name" => "scopes", "Type" => "TEXT"], 
                     ["Name" => "expiration", "Type" => "BIGINT"]
                 ]
             ],
             [
                 "Name" => "sessions",
                 "Columns" => [
-                    ["Name" => "id", "Type" => "TEXT"],
-                    ["Name" => "isloggedin", "Type" => "TINYINT"],
-                    ["Name" => "accessroles", "Type" => "TEXT"],
-                    ["Name" => "characterid", "Type" => "TEXT"],
-                    ["Name" => "charactername", "Type" => "TEXT"],
-                    ["Name" => "currentpage", "Type" => "TEXT"],
-                    ["Name" => "csrftoken", "Type" => "TEXT"],
-                    ["Name" => "expiration", "Type" => "BIGINT"],
+                    ["Name" => "id", "Type" => "TEXT"], 
+                    ["Name" => "isloggedin", "Type" => "TINYINT"], 
+                    ["Name" => "accessroles", "Type" => "TEXT"], 
+                    ["Name" => "characterid", "Type" => "TEXT"], 
+                    ["Name" => "charactername", "Type" => "TEXT"], 
+                    ["Name" => "currentpage", "Type" => "TEXT"], 
+                    ["Name" => "csrftoken", "Type" => "TEXT"], 
+                    ["Name" => "expiration", "Type" => "BIGINT"], 
                     ["Name" => "recheck", "Type" => "BIGINT"]
                 ]
             ],
             [
                 "Name" => "refreshtokens",
                 "Columns" => [
-                    ["Name" => "type", "Type" => "TEXT"],
-                    ["Name" => "characterid", "Type" => "TEXT"],
-                    ["Name" => "scopes", "Type" => "TEXT"],
-                    ["Name" => "refreshtoken", "Type" => "TEXT"],
-                    ["Name" => "accesstoken", "Type" => "TEXT"],
+                    ["Name" => "type", "Type" => "TEXT"], 
+                    ["Name" => "characterid", "Type" => "TEXT"], 
+                    ["Name" => "scopes", "Type" => "TEXT"], 
+                    ["Name" => "refreshtoken", "Type" => "TEXT"], 
+                    ["Name" => "accesstoken", "Type" => "TEXT"], 
                     ["Name" => "recheck", "Type" => "BIGINT"]
+                ]
+            ],
+            [
+                "Name" => "esicache",
+                "Columns" => [
+                    ["Name" => "endpoint", "Type" => "TEXT"], 
+                    ["Name" => "hash", "Type" => "TEXT"], 
+                    ["Name" => "expiration", "Type" => "BIGINT"], 
+                    ["Name" => "response", "Type" => "LONGTEXT"]
                 ]
             ],
         ];
