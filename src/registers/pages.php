@@ -21,7 +21,7 @@
                 [array] accessRoles: A list of access roles that will allow the user to access the page. Having any of the specified roles will allow access. A page with an empty array doesn't require any access roles to access. (DEFAULT: [])
                 
         For Examples see the already defined pages below. 
-            
+        
     */
     
     //HOME PAGE - DO NOT MODIFY LINK / CODE

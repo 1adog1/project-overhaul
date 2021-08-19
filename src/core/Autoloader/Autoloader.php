@@ -10,6 +10,7 @@
             "Ridley\\Views\\" => (__DIR__ . "/../../views/"),
             "Ridley\\Objects\\" => (__DIR__ . "/../../objects/"),
             "Ridley\\Interfaces\\" => (__DIR__ . "/../../interfaces/"),
+            "Ridley\\Tests\\" => (__DIR__ . "/../../tests/")
         ];
         
         $prefixFound = false;
