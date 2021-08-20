@@ -6,12 +6,13 @@
         
         private $defaultSuccessCodes = ["200", "204"];
         
-        private function hashRequest(string $url, string $method, ?array $payload) {
+        private function hashRequest(string $url, string $method, ?array $payload, ?string $accessToken) {
             
             $hashingArray = [
                 "URL" => $url, 
                 "Method" => $method, 
-                "Payload" => $payload
+                "Payload" => $payload, 
+                "Authentication" => $accessToken
             ];
             
             return hash("sha256", serialize($hashingArray));
@@ -149,7 +150,7 @@
             
             $cacheCheck = $this->checkCache(
                 $endpoint, 
-                $this->hashRequest($url, $method, $payload)
+                $this->hashRequest($url, $method, $payload, $accessToken)
             );
             
             if ($cacheCheck !== false) {
@@ -196,7 +197,7 @@
                             
                             $this->populateCache(
                                 $endpoint, 
-                                $this->hashRequest($url, $method, $payload), 
+                                $this->hashRequest($url, $method, $payload, $accessToken), 
                                 $request, 
                                 $expiry
                             );
