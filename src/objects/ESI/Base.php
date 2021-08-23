@@ -15,7 +15,7 @@
                 "Authentication" => $accessToken
             ];
             
-            return hash("sha256", serialize($hashingArray));
+            return hash("sha256", json_encode($hashingArray, JSON_UNESCAPED_SLASHES));
             
         }
         
