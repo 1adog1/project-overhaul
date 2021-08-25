@@ -11,6 +11,15 @@ class Methods(ESI_Base.Base):
             url = (self.esiURL + "latest/characters/" + str(arguments["character_id"]) + "/?datasource=tranquility"), 
             retries = (arguments["retries"] if "retries" in arguments else 0)
         )
+        
+    def character_locations(self, arguments):
+    
+        return self.makeRequest(
+            endpoint = "/characters/{character_id}/location/", 
+            url = (self.esiURL + "latest/characters/" + str(arguments["character_id"]) + "/location/?datasource=tranquility"), 
+            accessToken = self.accessToken, 
+            retries = (arguments["retries"] if "retries" in arguments else 0)
+        )
 
     def character_affiliations(self, arguments):
     
