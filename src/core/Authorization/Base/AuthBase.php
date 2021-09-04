@@ -280,7 +280,12 @@
                                     if ($loginData["Type"] === "Default") {
                                     
                                         $this->loginSuccess($accessCharacterID);
-                                    
+                                        
+                                    }
+                                    else {
+                                        
+                                        self::loginSuccess($accessCharacterID);
+                                        
                                     }
                                     
                                 }
