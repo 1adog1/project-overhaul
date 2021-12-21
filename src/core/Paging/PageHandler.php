@@ -152,7 +152,11 @@
             
             $rawURL = urldecode($_SERVER["REQUEST_URI"]);
             $parsedURL = parse_url($rawURL, PHP_URL_PATH);
-            $parsedPath = preg_split("@/@", $parsedURL, null, PREG_SPLIT_NO_EMPTY);
+            $parsedPath = preg_split(
+                pattern: "@/@", 
+                subject: $parsedURL, 
+                flags: PREG_SPLIT_NO_EMPTY
+            );
             
             if (count($parsedPath) >= 1) {
                 
