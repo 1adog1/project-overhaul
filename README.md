@@ -1,10 +1,12 @@
-# [Alpha] Project Overhaul
+# [Beta] Project Overhaul
 
 Project Overhaul is a new web application framework specifically designed for Eve Online applications. It replaces the *Access Control* framework that was used in my early projects with a much more robust object-oriented design. 
 
 This framework features built-in user authentication and access control that can be altered in-app, using either Eve Online Affiliations (Character, Corporation, Alliance) or Brave NeuCore Groups, with these different methods being interchangeable with a simple update of a config value. It also features an easy to use logging interface and a robust, in-app view and filter for log entries. 
 
-This framework is currently in Alpha. It works, but may contain bugs, and much of the functionality is not yet documented. It also still needs some optimization to improve load times. 
+This framework is currently in Beta. It works, much of the functionality is not yet documented. 
+
+**Current Version: Clay – 0 – 0**
 
 ## Requirements
 
