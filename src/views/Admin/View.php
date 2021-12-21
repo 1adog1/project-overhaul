@@ -14,7 +14,10 @@
                             <div class="h5 text-muted mb-0">Site Administration</div>
                             <hr class="text-light">
                             <li class="nav-item" role="presentation">
-                                <a href="#" class="nav-link active" id="admin-permissions-tab" data-bs-toggle="tab" data-bs-target="#admin-permissions" type="button" role="tab" aria-controls="admin-permissions" aria-selected="false">Permissions</a>
+                                <a href="#" class="nav-link active" id="admin-permissions-tab" data-bs-toggle="tab" data-bs-target="#admin-permissions" type="button" role="tab" aria-controls="admin-permissions" aria-selected="true">Permissions</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a href="#" class="nav-link" id="admin-about-tab" data-bs-toggle="tab" data-bs-target="#admin-about" type="button" role="tab" aria-controls="admin-about" aria-selected="false">About</a>
                             </li>
                         </ul>
                     </div>
@@ -30,6 +33,9 @@
                                     <?php $this->groupsTemplate(); ?>
                                 </div>
                             </div>
+                        </div>
+                        <div class="tab-pane fade" id="admin-about" role="tabpanel" aria-labelledby="admin-about-tab">
+                            <?php $this->aboutTemplate(); ?>
                         </div>
                     </div>
                 </div>
@@ -110,6 +116,100 @@
                 <?php
             }
             
+        }
+        
+        protected function aboutTemplate() {
+            
+            $versionInformation = parse_ini_file(__DIR__ . "/../../../VERSIONING", true);
+            $licenseText = file_get_contents(__DIR__ . "/../../../LICENSE");
+            
+            $applicationVersionArray = [
+                $versionInformation["App"]["major_version"], 
+                $versionInformation["App"]["minor_version"], 
+                $versionInformation["App"]["patch_version"]
+            ];
+            $overhaulVersionArray = [
+                $versionInformation["Overhaul"]["major_version"], 
+                $versionInformation["Overhaul"]["minor_version"], 
+                $versionInformation["Overhaul"]["patch_version"]
+            ];
+
+            $boostrapVersionArray = [
+                $versionInformation["Bootstrap"]["major_version"], 
+                $versionInformation["Bootstrap"]["minor_version"], 
+                $versionInformation["Bootstrap"]["patch_version"]
+            ];
+            $bootstrapIconsVersionArray = [
+                $versionInformation["Bootstrap Icons"]["major_version"], 
+                $versionInformation["Bootstrap Icons"]["minor_version"], 
+                $versionInformation["Bootstrap Icons"]["patch_version"]
+            ];
+            $jQueryVersionArray = [
+                $versionInformation["jQuery"]["major_version"], 
+                $versionInformation["jQuery"]["minor_version"], 
+                $versionInformation["jQuery"]["patch_version"]
+            ];
+
+            ?>
+            
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card bg-dark text-white mt-3 mb-3">
+                        <h4 class="card-header">Application</h4>
+                        <div class="card-body">
+                            <div>Version: <?php echo htmlspecialchars(implode($versionInformation["App"]["delimiter"], $applicationVersionArray)); ?></div>
+                            <div><a href="<?php echo htmlspecialchars($versionInformation["App"]["github_link"]); ?>"><i class="bi bi-github"></i> Github Repository</a></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card bg-dark text-white mt-3 mb-3">
+                        <h4 class="card-header">Project Overhaul</h4>
+                        <div class="card-body">
+                            <div>Version: <?php echo htmlspecialchars(implode($versionInformation["Overhaul"]["delimiter"], $overhaulVersionArray)); ?></div>
+                            <div><a href="<?php echo htmlspecialchars($versionInformation["Overhaul"]["github_link"]); ?>"><i class="bi bi-github"></i> Github Repository</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="card bg-dark text-white mt-3 mb-3">
+                        <h4 class="card-header">Bootstrap</h4>
+                        <div class="card-body">Version: <?php echo htmlspecialchars(implode(".", $boostrapVersionArray)); ?></div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card bg-dark text-white mt-3 mb-3">
+                        <h4 class="card-header">Bootstrap Icons</h4>
+                        <div class="card-body">Version: <?php echo htmlspecialchars(implode(".", $bootstrapIconsVersionArray)); ?></div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card bg-dark text-white mt-3 mb-3">
+                        <h4 class="card-header">jQuery</h4>
+                        <div class="card-body">Version: <?php echo htmlspecialchars(implode(".", $jQueryVersionArray)); ?></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="card bg-dark text-white mt-3 mb-3">
+                        <h4 class="card-header">Application License</h4>
+                        <div class="card-body" style="white-space: pre-line;"><?php echo htmlspecialchars($licenseText); ?></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="card bg-dark text-white mt-3 mb-3">
+                        <h4 class="card-header">Notice of CCP Intellectual Property Rights</h4>
+                        <div class="card-body" style="white-space: pre-line;">© 2014 CCP hf. All rights reserved. "EVE", "EVE Online", "CCP", and all related logos and images are trademarks or registered trademarks of CCP hf.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <?php
         }
         
         protected function metaTemplate() {
