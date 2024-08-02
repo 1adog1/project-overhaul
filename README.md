@@ -6,7 +6,7 @@ This framework features built-in user authentication and access control that can
 
 This framework is currently in Beta. It works, but much of the functionality is not yet documented.
 
-**Current Version: Clay – 1 – 0**
+**Current Version: Stone – 0 – 0**
 
 ## Requirements
 
@@ -25,39 +25,3 @@ The core of this framework requires the following:
   * This can be setup via the [Eve Online Developers Site](https://developers.eveonline.com/).
 * [When Using The Neucore Authentication Method] A Neucore Application
   * The application needs the `app-chars` and `app-groups` roles added, along with any groups that you want to be able to set access roles for.
-
-## The Basics
-
-### Functionality Goals
-
-### File Structure
-
-### Expandability
-
-## Initial Configuration
-
-### Config File
-
-### Database
-
-### Authentication
-
-#### Custom Access Roles
-
-### Logging
-
-#### Custom Log Types
-
-## Creating Pages
-
-### Registering a Page
-
-### View Classes
-
-### Model Classes
-
-### Controller Classes
-
-### API Classes
-
-### Local Resources

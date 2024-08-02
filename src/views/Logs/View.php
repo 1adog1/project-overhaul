@@ -272,7 +272,7 @@
         protected function rowTemplate($rowID, $rowTimestamp, $rowType, $rowActor, $rowPage) {
             
             $specialClass = match ($rowType) {
-                "Warning", "Notice", "Core Warning", "Compile Warning", "User Warning", "User Notice", "Recoverable Error" => "table-warning",
+                "Warning", "Notice", "Core Warning", "Compile Warning", "User Warning", "User Notice", "Recoverable Error", "Missing Hardcoded Input", "Bad Hardcoded Input" => "table-warning",
                 "Fatal Error", "Parsing Error", "Core Error", "Compile Error", "User Error", "Deprecated Code Error", "User Deprecated Code Error" => "table-danger",
                 default => ""
             };

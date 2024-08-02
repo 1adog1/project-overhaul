@@ -13,6 +13,7 @@
         private $cookieName;
 
         private $accessRoles = [];
+        private $coreGroups = [];
         private $isLoggedIn = false;
         private $csrfToken;
         private $characterStats = [];
@@ -79,6 +80,8 @@
                     $groupsResponseData = json_decode($groupsResponse, true);
 
                     foreach ($groupsResponseData as $eachGroup) {
+
+                        $this->coreGroups[$eachGroup["id"]] = $eachGroup["name"];
 
                         $accessRequest = $this->authorizationConnection->prepare("SELECT * FROM access WHERE type=:type AND id=:id");
                         $accessRequest->bindValue(":type", "Neucore");
@@ -236,6 +239,7 @@
                             if (time() < $sessionData["recheck"]) {
 
                                 $this->accessRoles = json_decode($sessionData["accessroles"], true);
+                                $this->coreGroups = json_decode($sessionData["coregroups"], true);
 
                             }
                             else {
@@ -283,6 +287,7 @@
 
             $convertedLoginStatus = (int)$this->isLoggedIn;
             $convertedAccessRoles = json_encode($this->accessRoles);
+            $convertedCoreGroups = json_encode($this->coreGroups);
 
             if ($this->isLoggedIn) {
 
@@ -309,10 +314,11 @@
 
             $sessionRecheck = time() + $this->authorizationVariables["Auth Cache Time"];
 
-            $insertSession = $this->authorizationConnection->prepare("INSERT INTO sessions (id, isloggedin, accessroles, characterid, charactername, currentpage, csrftoken, expiration, recheck) VALUES (:id, :isloggedin, :accessroles, :characterid, :charactername, :currentpage, :csrftoken, :expiration, :recheck)");
+            $insertSession = $this->authorizationConnection->prepare("INSERT INTO sessions (id, isloggedin, accessroles, coregroups, characterid, charactername, currentpage, csrftoken, expiration, recheck) VALUES (:id, :isloggedin, :accessroles, :coregroups, :characterid, :charactername, :currentpage, :csrftoken, :expiration, :recheck)");
             $insertSession->bindParam(":id", $SessionID);
             $insertSession->bindParam(":isloggedin", $convertedLoginStatus);
             $insertSession->bindParam(":accessroles", $convertedAccessRoles);
+            $insertSession->bindParam(":coregroups", $convertedCoreGroups);
             $insertSession->bindParam(":characterid", $convertedCharacterID);
             $insertSession->bindParam(":charactername", $convertedCharacterName);
             $insertSession->bindParam(":currentpage", $nullValue);
@@ -330,6 +336,7 @@
 
                 $convertedLoginStatus = (int)$this->isLoggedIn;
                 $convertedAccessRoles = json_encode($this->accessRoles);
+                $convertedCoreGroups = json_encode($this->coreGroups);
 
                 if ($this->isLoggedIn) {
 
@@ -344,9 +351,10 @@
 
                 $sessionRecheck = time() + $this->authorizationVariables["Auth Cache Time"];
 
-                $changeSession = $this->authorizationConnection->prepare("UPDATE sessions SET isloggedin=:isloggedin, accessroles=:accessroles, characterid=:characterid, recheck=:recheck WHERE id=:id");
+                $changeSession = $this->authorizationConnection->prepare("UPDATE sessions SET isloggedin=:isloggedin, accessroles=:accessroles, coregroups=:coregroups, characterid=:characterid, recheck=:recheck WHERE id=:id");
                 $changeSession->bindParam(":isloggedin", $convertedLoginStatus);
                 $changeSession->bindParam(":accessroles", $convertedAccessRoles);
+                $changeSession->bindParam(":coregroups", $convertedCoreGroups);
                 $changeSession->bindParam(":characterid", $convertedCharacterID);
                 $changeSession->bindParam(":recheck", $sessionRecheck);
                 $changeSession->bindParam(":id", $_COOKIE[$this->cookieName]);
@@ -372,6 +380,12 @@
         public function getAccessRoles() {
 
             return $this->accessRoles;
+
+        }
+
+        public function getCoreGroups() {
+
+            return $this->coreGroups;
 
         }
 
@@ -406,6 +420,7 @@
         private function logout() {
 
             $this->accessRoles = [];
+            $this->coreGroups = [];
             $this->isLoggedIn = false;
             $this->characterStats = [];
 

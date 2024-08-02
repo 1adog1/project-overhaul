@@ -44,6 +44,7 @@
                     ["Name" => "id", "Type" => "TEXT"], 
                     ["Name" => "isloggedin", "Type" => "TINYINT"], 
                     ["Name" => "accessroles", "Type" => "TEXT"], 
+                    ["Name" => "coregroups", "Type" => "TEXT"], 
                     ["Name" => "characterid", "Type" => "TEXT"], 
                     ["Name" => "charactername", "Type" => "TEXT"], 
                     ["Name" => "currentpage", "Type" => "TEXT"], 

@@ -55,12 +55,14 @@ class Base:
         return result
         
     def populateCache(self, endpoint, hash, response, expires):
+
+        response_to_save = json.dumps(response, separators=(",", ":"))
     
         databaseCursor = self.databaseConnection.cursor(buffered=True)
     
         insertStatement = "INSERT INTO esicache (endpoint, hash, expiration, response) VALUES (%s, %s, %s, %s)"
         
-        databaseCursor.execute(insertStatement, (endpoint, hash, expires, response))
+        databaseCursor.execute(insertStatement, (endpoint, hash, expires, response_to_save))
         
         self.databaseConnection.commit()
         databaseCursor.close()
@@ -78,7 +80,7 @@ class Base:
         retries = 0
     ):
     
-        responseData = {"Success": False, "Data": None}
+        responseData = {"Success": False, "Data": [], "Status Code": None, "Headers": None}
     
         self.cleanupCache()
         
@@ -89,8 +91,7 @@ class Base:
         
         if cacheCheck != False:
         
-            responseData["Success"] = True
-            responseData["Data"] = cacheCheck
+            responseData = cacheCheck
             
             return responseData
             
@@ -120,6 +121,9 @@ class Base:
                     data = requestData, 
                     headers = headers
                 )
+
+                responseData["Status Code"] = request.status_code
+                responseData["Headers"] = dict(request.headers)
                 
                 if request.status_code in (self.defaultSuccessCodes + successCodes):
                 
@@ -127,7 +131,10 @@ class Base:
                     
                     if expectResponse:
                     
-                        responseData["Data"] = json.loads(request.text)
+                        try:
+                            responseData["Data"] = json.loads(request.text)
+                        except:
+                            pass
                         
                         if "Expires" in request.headers:
                         
@@ -141,7 +148,7 @@ class Base:
                         self.populateCache(
                             endpoint, 
                             self.hashRequest(url, method, payload, accessToken), 
-                            request.text, 
+                            responseData, 
                             expiry
                         )
                         
@@ -159,7 +166,7 @@ class Base:
                         
                         except:
                         
-                            responseData["Data"] = None
+                            pass
                         
                     return responseData
             

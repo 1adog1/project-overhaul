@@ -2,6 +2,8 @@
 
     namespace Ridley\Apis\Admin;
 
+    use Ridley\Core\Exceptions\UserInputException;
+
     class Api implements \Ridley\Interfaces\Api {
 
         private $availableRoles = [];
@@ -74,16 +76,24 @@
                 }
                 else {
 
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request");
-                    throw new \Exception("No valid combination of action and required secondary arguments was received.", 10002);
+                    throw new UserInputException(
+                        inputs: ["Action", "Secondary Arguments"], 
+                        expected_values: ["A valid action command", "The action's arguments"], 
+                        hard_coded_inputs: true,
+                        value_missing: true
+                    );
 
                 }
 
             }
             else {
 
-                header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request");
-                throw new \Exception("Request is missing the action argument.", 10001);
+                throw new UserInputException(
+                    inputs: "Action", 
+                    expected_values: "An action command", 
+                    hard_coded_inputs: true,
+                    value_missing: true
+                );
 
             }
 
@@ -218,15 +228,23 @@
                 }
                 else {
 
-                    header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
-
+                    throw new UserInputException(
+                        inputs: "Term", 
+                        expected_values: "A search term", 
+                        value_missing: true
+                    );
+                    
                 }
 
             }
             else {
 
-                header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request");
-                throw new \Exception("Unapproved Search Type Requested.", 12002);
+                throw new UserInputException(
+                    inputs: "Type", 
+                    expected_values: "A valid type of entity to search for", 
+                    hard_coded_inputs: true,
+                    value_missing: true
+                );
 
             }
 
@@ -253,16 +271,22 @@
                 }
                 else {
 
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request");
-                    throw new \Exception("A group that was requested to be added already exists.", 12003);
+                    throw new UserInputException(
+                        inputs: "Type / ID Combination", 
+                        expected_values: "A type and id combination not already in the database", 
+                        hard_coded_inputs: true
+                    );
 
                 }
 
             }
             else {
-
-                header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
-                throw new \Exception("The ID or Name of a group that was requested to be added does not exist.", 12004);
+                
+                throw new UserInputException(
+                    inputs: ["Type", "ID", "Name"], 
+                    expected_values: ["A valid type of entity to add", "A valid entity id", "The name matching the id"], 
+                    hard_coded_inputs: true
+                );
 
             }
 
@@ -284,8 +308,11 @@
             }
             else {
 
-                header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
-                throw new \Exception("The group that was requested to be removed does not exist.", 12005);
+                throw new UserInputException(
+                    inputs: ["Type", "ID"], 
+                    expected_values: ["A valid type of group to remove", "A valid group id"], 
+                    hard_coded_inputs: true
+                );
 
             }
 
@@ -321,8 +348,11 @@
 
                         default:
 
-                            header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request");
-                            throw new \Exception("Invalid type of change was received for an access group.", 12006);
+                            throw new UserInputException(
+                                inputs: "Change", 
+                                expected_values: "Added or Removed", 
+                                hard_coded_inputs: true
+                            );
 
                     }
 
@@ -341,16 +371,22 @@
                 }
                 else {
 
-                    header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
-                    throw new \Exception("The group for which a change was requested does not exist.", 12007);
+                    throw new UserInputException(
+                        inputs: ["Type", "ID"], 
+                        expected_values: ["A valid type of group", "A valid group id"], 
+                        hard_coded_inputs: true
+                    );
 
                 }
 
             }
             else {
 
-                header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request");
-                throw new \Exception("A change was requested using an invalid role.", 12008);
+                throw new UserInputException(
+                    inputs: "Role", 
+                    expected_values: "A valid role", 
+                    hard_coded_inputs: true
+                );
 
             }
 

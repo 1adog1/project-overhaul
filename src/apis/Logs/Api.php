@@ -2,6 +2,8 @@
 
     namespace Ridley\Apis\Logs;
 
+    use Ridley\Core\Exceptions\UserInputException;
+
     class Api implements \Ridley\Interfaces\Api {
 
         private $databaseConnection;
@@ -21,16 +23,24 @@
                 }
                 else {
 
-                    header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request");
-                    throw new \Exception("No valid combination of action and required secondary arguments was received.", 10002);
+                    throw new UserInputException(
+                        inputs: ["Action", "Secondary Arguments"], 
+                        expected_values: ["A valid action command", "The action's arguments"], 
+                        hard_coded_inputs: true,
+                        value_missing: true
+                    );
 
                 }
 
             }
             else {
 
-                header($_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request");
-                throw new \Exception("Request is missing the action argument.", 10001);
+                throw new UserInputException(
+                    inputs: "Action", 
+                    expected_values: "An action command", 
+                    hard_coded_inputs: true,
+                    value_missing: true
+                );
 
             }
 
@@ -51,8 +61,11 @@
             }
             else {
 
-                header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
-                throw new \Exception("A request was made for a log entry id that does not exist.", 11001);
+                throw new UserInputException(
+                    inputs: "Row ID", 
+                    expected_values: "A valid row ID", 
+                    hard_coded_inputs: true
+                );
 
             }
 

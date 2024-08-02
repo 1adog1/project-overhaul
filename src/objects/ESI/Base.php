@@ -62,13 +62,15 @@
 
         }
 
-        private function populateCache(string $endpoint, string $hash, string $response, int $expires) {
+        private function populateCache(string $endpoint, string $hash, array $response, int $expires) {
+
+            $response_to_save = json_encode($response, JSON_UNESCAPED_SLASHES);
 
             $insertSession = $this->databaseConnection->prepare("INSERT INTO esicache (endpoint, hash, expiration, response) VALUES (:endpoint, :hash, :expiration, :response)");
             $insertSession->bindParam(":endpoint", $endpoint);
             $insertSession->bindParam(":hash", $hash);
             $insertSession->bindParam(":expiration", $expires);
-            $insertSession->bindParam(":response", $response);
+            $insertSession->bindParam(":response", $response_to_save);
 
             $insertSession->execute();
 
@@ -100,13 +102,15 @@
 
         private function parseHeaders(array $headerList) {
 
-            $parsedHeaders = ["Status Code" => $headerList[0], "Headers" => []];
+            $statusCode = (int)(explode(" ", $headerList[0])[1]);
+
+            $parsedHeaders = ["Status Code" => $statusCode, "Headers" => []];
 
             foreach (array_slice($headerList, 1) as $eachHeader) {
 
-                $splitHeader = explode(":", $eachHeader);
+                $splitHeader = explode(": ", $eachHeader, 2);
                 $headerTitle = $splitHeader[0];
-                $headerData = implode(":", array_slice($splitHeader, 1));
+                $headerData = $splitHeader[1];
 
                 $parsedHeaders["Headers"][$headerTitle] = $headerData;
 
@@ -120,17 +124,7 @@
 
             $successCodes = array_unique(array_merge($this->defaultSuccessCodes, $customSuccessCodes));
 
-            foreach ($successCodes as $eachCode) {
-
-                if (str_contains($responseCode, $eachCode)) {
-
-                    return true;
-
-                }
-
-            }
-
-            return false;
+            return in_array($responseCode, $successCodes);
 
         }
 
@@ -146,7 +140,7 @@
             int $retries = 0
         ) {
 
-            $responseData = ["Success" => false, "Data" => null];
+            $responseData = ["Success" => false, "Data" => [], "Status Code" => null, "Headers" => null];
 
             $this->cleanupCache();
 
@@ -157,8 +151,7 @@
 
             if ($cacheCheck !== false) {
 
-                $responseData["Success"] = true;
-                $responseData["Data"] = $cacheCheck;
+                $responseData = $cacheCheck;
 
                 return $responseData;
 
@@ -177,18 +170,27 @@
                     );
 
                     $responseHeaders = $this->parseHeaders($http_response_header);
+                    $responseData["Status Code"] = $responseHeaders["Status Code"];
+                    $responseData["Headers"] = $responseHeaders["Headers"];
 
-                    if ($this->checkForSuccess($responseHeaders["Status Code"], $successCodes)) {
+                    if ($this->checkForSuccess($responseData["Status Code"], $successCodes)) {
 
                         $responseData["Success"] = true;
 
                         if ($expectResponse) {
 
-                            $responseData["Data"] = json_decode($request, true);
+                            try {
+                                $responseData["Data"] = json_decode(
+                                    json: $request, 
+                                    associative: true,
+                                    flags: JSON_THROW_ON_ERROR
+                                );
+                            }
+                            catch (\Exception $error) {}
 
-                            if (isset($responseHeaders["Headers"]["Expires"])) {
+                            if (isset($responseData["Headers"]["Expires"])) {
 
-                                $expiry = strtotime($responseHeaders["Headers"]["Expires"]);
+                                $expiry = strtotime($responseData["Headers"]["Expires"]);
 
                             }
                             else {
@@ -200,7 +202,7 @@
                             $this->populateCache(
                                 $endpoint,
                                 $this->hashRequest($url, $method, $payload, $accessToken),
-                                $request,
+                                $responseData,
                                 $expiry
                             );
 
@@ -215,7 +217,14 @@
 
                         if ($expectResponse) {
 
-                            $responseData["Data"] = json_decode($request, true);
+                            try {
+                                $responseData["Data"] = json_decode(
+                                    json: $request, 
+                                    associative: true,
+                                    flags: JSON_THROW_ON_ERROR
+                                );
+                            }
+                            catch (\Exception $error) {}
 
                         }
 

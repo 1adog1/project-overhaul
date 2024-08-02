@@ -331,6 +331,12 @@
 
         }
 
+        public function getCoreGroups() {
+
+            return [];
+
+        }
+
         public function getCharacterStats() {
 
             return $this->characterStats;

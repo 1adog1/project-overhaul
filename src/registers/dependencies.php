@@ -31,6 +31,7 @@
     $dependencyManager->register("CSRF Token", $userAuthorization->getCSRFToken());
     $dependencyManager->register("Login Status", $userAuthorization->getLoginStatus());
     $dependencyManager->register("Access Roles", $userAuthorization->getAccessRoles());
+    $dependencyManager->register("Core Groups", $userAuthorization->getCoreGroups());
     $dependencyManager->register("Character Stats", $userAuthorization->getCharacterStats());
     
     //Dependencies above this line are required for critical base app functionality.
