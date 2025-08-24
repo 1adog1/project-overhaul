@@ -8,7 +8,7 @@
 
             return $this->makeRequest(
                 endpoint: "/characters/affiliation/",
-                url: ($this->esiURL . "latest/characters/affiliation/?datasource=tranquility"),
+                url: ($this->esiURL . "characters/affiliation/?datasource=tranquility"),
                 method: "POST",
                 payload: $arguments["characters"],
                 cacheTime: 3600,
@@ -24,7 +24,7 @@
             $language = (isset($arguments["language"]) ? ("&language=" . $arguments["language"]) : "");;
             $strict = (isset($arguments["strict"]) ? ("&strict=" . $arguments["strict"]) : "");
 
-            $url = $this->esiURL . "latest/characters/" . $arguments["character_id"] . "/search/?datasource=tranquility&categories=" . $categories . "&search=" . $search . $language . $strict;
+            $url = $this->esiURL . "characters/" . $arguments["character_id"] . "/search/?datasource=tranquility&categories=" . $categories . "&search=" . $search . $language . $strict;
 
             return $this->makeRequest(
                 endpoint: "/characters/{character_id}/search/",
@@ -39,7 +39,7 @@
 
             return $this->makeRequest(
                 endpoint: "/universe/names/",
-                url: ($this->esiURL . "latest/universe/names/?datasource=tranquility"),
+                url: ($this->esiURL . "universe/names/?datasource=tranquility"),
                 method: "POST",
                 payload: $arguments["ids"],
                 cacheTime: 3600,

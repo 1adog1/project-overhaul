@@ -7,6 +7,7 @@
     class Base {
 
         private $defaultSuccessCodes = ["200", "204"];
+        private $defaultCompatibilityDate = "2025-08-01";
 
         private function hashRequest(string $url, string $method, ?array $payload, ?string $accessToken) {
 
@@ -76,13 +77,16 @@
 
         }
 
-        private function buildContext(string $method, ?array $payload, ?string $accessToken) {
+        private function buildContext(string $method, ?array $payload, ?string $accessToken, ?string $compatibilityDate) {
+
+            $compatibilityDateHeader = $compatibilityDate ?? $this->defaultCompatibilityDate;
 
             $context = [
                 "http" => [
                     "ignore_errors" => true,
                     "header" => [
-                        "accept: application/json"
+                        "accept: application/json",
+                        "X-Compatibility-Date: " . $compatibilityDateHeader
                     ],
                     "method" => $method
                 ]
@@ -132,8 +136,9 @@
             string $endpoint,
             string $url,
             string $method = "GET",
-            array $payload = null,
-            string $accessToken = null,
+            ?array $payload = null,
+            ?string $accessToken = null,
+            ?string $compatibilityDate = null,
             bool $expectResponse = true,
             array $successCodes = [],
             int $cacheTime = 0,
@@ -161,7 +166,7 @@
                 for ($remainingRetries = $retries; $remainingRetries >= 0; $remainingRetries--) {
 
                     $requestContext = stream_context_create(
-                        $this->buildContext($method, $payload, $accessToken)
+                        $this->buildContext($method, $payload, $accessToken, $compatibilityDate)
                     );
 
                     $request = file_get_contents(

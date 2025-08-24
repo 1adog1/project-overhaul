@@ -1,3 +1,25 @@
+# Minor Version Update Stone – 1 – 0
+
+## Neucore Authentication
+- Created a `NeucoreAuthHandler` class in the included `ESI` Python library.
+- Added Python and PHP methods for getting Access Tokens directly from Neucore. These tokens are cached in a new `coretokens` database table.
+    - `getAccessToken` in Python's `ESI.NeucoreAuthHandler`
+    - `getNeucoreAccessToken` in PHP's `Ridley\Core\Authorization\Neucore\AuthHandler`
+- Added Python and PHP methods for cleaning up old access tokens in `coretokens`.
+    - `cleanupTokens` in Python's `ESI.NeucoreAuthHandler`
+    - `cleanupNeucoreAccessTokens` in PHP's `Ridley\Core\Authorization\Neucore\AuthHandler`
+- Added Python and PHP methods for getting a list of characters for a particular Neucore login. 
+    - `getLoginCharacterIDs` and `getLoginCharacters` in Python's `ESI.NeucoreAuthHandler`
+    - `getNeucoreLoginCharacterIDs` and `getNeucoreLoginCharacters` in PHP's `Ridley\Core\Authorization\Neucore\AuthHandler`
+
+## ESI
+- Changed versioning scheme to the new `X-Compatibility-Date`.
+- Fixed deprecated implicitly nullable argument in `Ridley\Objects\ESI\Base`.
+
+## Database
+- Changed a bunch of `TEXT` types to fixed-size types like `ENUM`, `BIGINT`, and `VARCHAR`.
+- All default tables now have primary keys.
+
 # Major Version Update Stone – 0 – 0
 
 ## Authentication

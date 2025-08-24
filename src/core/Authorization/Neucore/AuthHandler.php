@@ -17,6 +17,7 @@
         private $isLoggedIn = false;
         private $csrfToken;
         private $characterStats = [];
+        private $neucoreAuthHeader;
         protected $esiHandler;
 
         public function __construct(
@@ -28,6 +29,9 @@
             $this->esiHandler = new \Ridley\Objects\ESI\Handler($authorizationConnection);
 
             $this->cookieName = $authorizationVariables["Auth Cookie Name"];
+
+            $neucoreToken = base64_encode($this->authorizationVariables["NeuCore ID"] . ":" . $this->authorizationVariables["NeuCore Secret"]);
+            $this->neucoreAuthHeader = "Bearer " . $neucoreToken;
 
             $this->cleanupLogins();
             $this->cleanupSessions();
@@ -64,11 +68,9 @@
 
             while (!$groupsSuccess and $groupCallCounter < 5) {
 
-                $neucoreToken = base64_encode($this->authorizationVariables["NeuCore ID"] . ":" . $this->authorizationVariables["NeuCore Secret"]);
-
                 $groupsRequestURL = $this->authorizationVariables["NeuCore URL"] . "api/app/v2/groups/" . $this->characterStats["Character ID"];
 
-                $groupsRequestOptions = ["http" => ["ignore_errors" => true, "method" => "GET", "header" => ["Content-Type:application/json", "Authorization: Bearer " . $neucoreToken]]];
+                $groupsRequestOptions = ["http" => ["ignore_errors" => true, "method" => "GET", "header" => ["Content-Type:application/json", "Authorization: " . $this->neucoreAuthHeader]]];
                 $groupsRequestContext = stream_context_create($groupsRequestOptions);
 
                 $groupsResponse = file_get_contents($groupsRequestURL, false, $groupsRequestContext);
@@ -362,6 +364,184 @@
                 $changeSession->execute();
 
             }
+
+        }
+
+        private function pullNeucoreAccessToken ($characterID, $loginType) {
+
+            $returnData = ["Status" => "Fail", "Access Token" => null];
+            
+            $timeToCheck = time() + 15;
+
+            $pullToken = $this->authorizationConnection->prepare("SELECT DISTINCT accesstoken, recheck FROM coretokens WHERE type=:type AND characterid=:characterid");
+            $pullToken->bindParam(":type", $loginType);
+            $pullToken->bindParam(":characterid", $characterID);
+
+            $pullToken->execute();
+
+            $tokenData = $pullToken->fetch();
+
+            if ($tokenData !== false) {
+
+                if ($tokenData["recheck"] <= $timeToCheck) {
+
+                    $returnData["Status"] = "Out of Date";
+
+                }
+
+                else {
+
+                    $returnData["Access Token"] = $tokenData["accesstoken"];
+                    $returnData["Status"] = "Success";
+
+                }
+
+            }
+
+            return $returnData;
+
+        }
+
+        private function updateNeucoreAccessToken ($characterID, $loginType, $accessToken, $recheck) {
+            
+            $updateToken = $this->authorizationConnection->prepare("REPLACE INTO coretokens (type, characterid, accesstoken, recheck) VALUES (:type, :characterid, :accesstoken, :recheck)");
+            $updateToken->bindParam(":type", $loginType);
+            $updateToken->bindParam(":characterid", $characterID);
+            $updateToken->bindParam(":accesstoken", $accessToken);
+            $updateToken->bindParam(":recheck", $recheck);
+
+            $updateToken->execute();
+
+        }
+
+        private function refreshNeucoreAccessToken ($characterID, $loginType, $retries = 0) {
+
+            $tokenRequestURL = $this->authorizationVariables["NeuCore URL"] . "api/app/v1/esi/access-token/" . $characterID . "?" . http_build_query(["eveLoginName" => $loginType]);
+
+            $tokenRequestOptions = ["http" => ["ignore_errors" => true, "method" => "GET", "header" => ["Content-Type:application/json", "Authorization: " . $this->neucoreAuthHeader]]];
+            $tokenRequestContext = stream_context_create($tokenRequestOptions);
+
+            foreach (range(0, $retries) as $attempt) {
+
+                $tokenResponse = file_get_contents($tokenRequestURL, false, $tokenRequestContext);
+
+                $tokenStatus = $http_response_header[0];
+
+                if (str_contains($tokenStatus, "200")) {
+
+                    $tokenResponseData = json_decode($tokenResponse, true);
+
+                    $this->updateNeucoreAccessToken($characterID, $loginType, $tokenResponseData["token"], $tokenResponseData["expires"]);
+
+                    return $tokenResponseData["token"];
+
+                }
+                elseif (str_contains($tokenStatus, "204") or str_contains($tokenStatus, "404")) {
+                    
+                    return;
+
+                }
+                elseif ($attempt == $retries) {
+
+                    return;
+                    
+                }
+
+            }
+
+        }
+
+        //This method is incompatible with the "core.default" login_type!
+        public function getNeucoreLoginCharacters($loginType, $retries = 0) {
+
+            $charactersRequestURL = $this->authorizationVariables["NeuCore URL"] . "api/app/v1/esi/eve-login/" . $loginType . "/token-data";
+
+            $charactersRequestOptions = ["http" => ["ignore_errors" => true, "method" => "GET", "header" => ["Content-Type:application/json", "Authorization: " . $this->neucoreAuthHeader]]];
+            $charactersRequestContext = stream_context_create($charactersRequestOptions);
+
+            foreach (range(0, $retries) as $attempt) {
+
+                $charactersResponse = file_get_contents($charactersRequestURL, false, $charactersRequestContext);
+
+                $charactersStatus = $http_response_header[0];
+
+                if (str_contains($charactersStatus, "200")) {
+
+                    $charactersResponseData = json_decode($charactersResponse, true);
+                    return $charactersResponseData;
+
+                }
+                elseif (str_contains($charactersStatus, "404")) {
+                    return;
+                }
+                elseif ($attempt == $retries) {
+                    return;
+                }
+
+            }
+
+        }
+
+        public function getNeucoreLoginCharacterIDs($loginType, $retries = 0) {
+
+            $characterIDsRequestURL = $this->authorizationVariables["NeuCore URL"] . "api/app/v1/esi/eve-login/" . $loginType . "/characters";
+
+            $characterIDsRequestOptions = ["http" => ["ignore_errors" => true, "method" => "GET", "header" => ["Content-Type:application/json", "Authorization: " . $this->neucoreAuthHeader]]];
+            $characterIDsRequestContext = stream_context_create($characterIDsRequestOptions);
+
+            foreach (range(0, $retries) as $attempt) {
+
+                $characterIDsResponse = file_get_contents($characterIDsRequestURL, false, $characterIDsRequestContext);
+
+                $characterIDsStatus = $http_response_header[0];
+
+                if (str_contains($characterIDsStatus, "200")) {
+
+                    $characterIDsResponseData = json_decode($characterIDsResponse, true);
+                    return $characterIDsResponseData;
+
+                }
+                elseif (str_contains($characterIDsStatus, "404")) {
+                    return;
+                }
+                elseif ($attempt == $retries) {
+                    return;
+                }
+
+            }
+
+        }
+
+        public function getNeucoreAccessToken($characterID, $loginType, $retries = 0) {
+
+            $tokenData = $this->pullNeucoreAccessToken($characterID, $loginType);
+
+            if ($tokenData["Status"] == "Success") {
+            
+                return $tokenData["Access Token"];
+
+            }
+            
+            elseif ($tokenData["Status"] == "Out of Date") {
+            
+                return $this->refreshNeucoreAccessToken($characterID, $loginType, $retries);
+
+            }
+            
+            elseif ($tokenData["Status"] == "Fail") {
+                
+                return $this->refreshNeucoreAccessToken($characterID, $loginType, $retries);
+
+            }
+
+        }
+
+        public function cleanupNeucoreAccessTokens() {
+
+            $tokenCleanup = $this->authorizationConnection->prepare("DELETE FROM coretokens WHERE recheck <= :recheck");
+            $tokenCleanup->bindValue(":recheck", ((int)time()));
+
+            $tokenCleanup->execute();
 
         }
 

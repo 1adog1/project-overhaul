@@ -7,6 +7,7 @@ import email
 class Base:
 
     defaultSuccessCodes = [200, 204]
+    defaultCompatibilityDate = "2025-08-01"
 
     def hashRequest(self, url, method, payload, accessToken):
     
@@ -74,6 +75,7 @@ class Base:
         method = "GET", 
         payload = None, 
         accessToken = None, 
+        compatibilityDate = None,
         expectResponse = True, 
         successCodes = [], 
         cacheTime = 0, 
@@ -101,7 +103,10 @@ class Base:
             
                 requestMethod = getattr(requests, method.lower())
                 
-                headers = {"accept": "application/json"}
+                headers = {
+                    "accept": "application/json",
+                    "X-Compatibility-Date": (compatibilityDate if compatibilityDate is not None else self.defaultCompatibilityDate)
+                }
                 
                 if accessToken is not None:
                 

@@ -11,7 +11,7 @@ github_link =
 [Overhaul]
 ; These values denote the version of the Project Overhaul Template your app is based on.
 major_version = Stone
-minor_version = 0
+minor_version = 1
 patch_version = 0
 delimiter = " – "
 github_link = https://github.com/1adog1/project-overhaul/

@@ -8,7 +8,7 @@ class Methods(ESI_Base.Base):
     
         return self.makeRequest(
             endpoint = "/characters/{character_id}/", 
-            url = (self.esiURL + "latest/characters/" + str(arguments["character_id"]) + "/?datasource=tranquility"), 
+            url = (self.esiURL + "characters/" + str(arguments["character_id"]) + "/?datasource=tranquility"), 
             retries = (arguments["retries"] if "retries" in arguments else 0)
         )
         
@@ -16,7 +16,7 @@ class Methods(ESI_Base.Base):
     
         return self.makeRequest(
             endpoint = "/characters/{character_id}/location/", 
-            url = (self.esiURL + "latest/characters/" + str(arguments["character_id"]) + "/location/?datasource=tranquility"), 
+            url = (self.esiURL + "characters/" + str(arguments["character_id"]) + "/location/?datasource=tranquility"), 
             accessToken = self.accessToken, 
             retries = (arguments["retries"] if "retries" in arguments else 0)
         )
@@ -25,7 +25,7 @@ class Methods(ESI_Base.Base):
     
         return self.makeRequest(
             endpoint = "/characters/affiliation/",
-            url = (self.esiURL + "latest/characters/affiliation/?datasource=tranquility"), 
+            url = (self.esiURL + "characters/affiliation/?datasource=tranquility"), 
             method = "POST", 
             payload = arguments["characters"], 
             cacheTime = 3600, 
@@ -36,7 +36,7 @@ class Methods(ESI_Base.Base):
     
         return self.makeRequest(
             endpoint = "/universe/names/",
-            url = (self.esiURL + "latest/universe/names/?datasource=tranquility"), 
+            url = (self.esiURL + "universe/names/?datasource=tranquility"), 
             method = "POST", 
             payload = arguments["ids"], 
             cacheTime = 3600, 

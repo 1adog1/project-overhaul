@@ -23,17 +23,18 @@
             [
                 "Name" => "access",
                 "Columns" => [
-                    ["Name" => "type", "Type" => "TEXT"], 
+                    ["Name" => "type", "Type" => "ENUM('Character', 'Corporation', 'Alliance', 'Neucore')"], 
                     ["Name" => "id", "Type" => "BIGINT"], 
                     ["Name" => "name", "Type" => "TEXT"], 
-                    ["Name" => "roles", "Type" => "TEXT"]
+                    ["Name" => "roles", "Type" => "TEXT"],
+                    ["Name" => "", "Type" => "", "Special" => "CONSTRAINT access_pk PRIMARY KEY (type, id)"]
                 ]
             ],
             [
                 "Name" => "logins",
                 "Columns" => [
-                    ["Name" => "type", "Type" => "TEXT"], 
-                    ["Name" => "state", "Type" => "TEXT"], 
+                    ["Name" => "type", "Type" => "VARCHAR(64)"], 
+                    ["Name" => "state", "Type" => "VARCHAR(32)", "Special" => "primary key"], 
                     ["Name" => "scopes", "Type" => "TEXT"], 
                     ["Name" => "expiration", "Type" => "BIGINT"]
                 ]
@@ -41,14 +42,14 @@
             [
                 "Name" => "sessions",
                 "Columns" => [
-                    ["Name" => "id", "Type" => "TEXT"], 
+                    ["Name" => "id", "Type" => "VARCHAR(128)", "Special" => "primary key"], 
                     ["Name" => "isloggedin", "Type" => "TINYINT"], 
                     ["Name" => "accessroles", "Type" => "TEXT"], 
                     ["Name" => "coregroups", "Type" => "TEXT"], 
-                    ["Name" => "characterid", "Type" => "TEXT"], 
+                    ["Name" => "characterid", "Type" => "BIGINT"], 
                     ["Name" => "charactername", "Type" => "TEXT"], 
                     ["Name" => "currentpage", "Type" => "TEXT"], 
-                    ["Name" => "csrftoken", "Type" => "TEXT"], 
+                    ["Name" => "csrftoken", "Type" => "VARCHAR(32)"], 
                     ["Name" => "expiration", "Type" => "BIGINT"], 
                     ["Name" => "recheck", "Type" => "BIGINT"]
                 ]
@@ -56,21 +57,33 @@
             [
                 "Name" => "refreshtokens",
                 "Columns" => [
-                    ["Name" => "type", "Type" => "TEXT"], 
-                    ["Name" => "characterid", "Type" => "TEXT"], 
+                    ["Name" => "type", "Type" => "VARCHAR(64)"], 
+                    ["Name" => "characterid", "Type" => "BIGINT"], 
                     ["Name" => "scopes", "Type" => "TEXT"], 
                     ["Name" => "refreshtoken", "Type" => "TEXT"], 
                     ["Name" => "accesstoken", "Type" => "TEXT"], 
-                    ["Name" => "recheck", "Type" => "BIGINT"]
+                    ["Name" => "recheck", "Type" => "BIGINT"],
+                    ["Name" => "", "Type" => "", "Special" => "CONSTRAINT refresh_tokens_pk PRIMARY KEY (type, characterid)"]
+                ]
+            ],
+            [
+                "Name" => "coretokens",
+                "Columns" => [
+                    ["Name" => "type", "Type" => "VARCHAR(20)"], 
+                    ["Name" => "characterid", "Type" => "BIGINT"], 
+                    ["Name" => "accesstoken", "Type" => "TEXT"], 
+                    ["Name" => "recheck", "Type" => "BIGINT"],
+                    ["Name" => "", "Type" => "", "Special" => "CONSTRAINT core_tokens_pk PRIMARY KEY (type, characterid)"]
                 ]
             ],
             [
                 "Name" => "esicache",
                 "Columns" => [
-                    ["Name" => "endpoint", "Type" => "TEXT"], 
-                    ["Name" => "hash", "Type" => "TEXT"], 
+                    ["Name" => "endpoint", "Type" => "VARCHAR(128)"], 
+                    ["Name" => "hash", "Type" => "VARCHAR(64)"], 
                     ["Name" => "expiration", "Type" => "BIGINT"], 
-                    ["Name" => "response", "Type" => "LONGTEXT"]
+                    ["Name" => "response", "Type" => "LONGTEXT"],
+                    ["Name" => "", "Type" => "", "Special" => "CONSTRAINT esi_cache_pk PRIMARY KEY (endpoint, hash)"]
                 ]
             ],
         ];
