@@ -1,5 +1,6 @@
 import hashlib
 import json
+import base64
 import time
 import requests
 import email
@@ -7,7 +8,7 @@ import email
 class Base:
 
     defaultSuccessCodes = [200, 204]
-    defaultCompatibilityDate = "2025-08-01"
+    defaultCompatibilityDate = "2026-06-01"
 
     def hashRequest(self, url, method, payload, accessToken):
     
@@ -15,7 +16,7 @@ class Base:
             "URL": url, 
             "Method": method, 
             "Payload": payload, 
-            "Authentication": accessToken
+            "Subject": self.unpackAccessToken(accessToken)["Payload"]["sub"] if accessToken is not None else None
         }
         
         hashingData = str.encode(
@@ -24,6 +25,31 @@ class Base:
         
         return hashlib.sha256(hashingData).hexdigest()
         
+    def unpackAccessToken(self, accessToken):
+        
+        if accessToken is not None:
+
+            accessArray = accessToken.split(".")
+            accessHeader = json.loads(base64.b64decode(accessArray[0] + "===").decode("utf-8"))
+            accessPayload = json.loads(base64.b64decode(accessArray[1] + "===").decode("utf-8"))
+            accessSignature = accessArray[2]
+
+            return {
+                "Token": accessToken,
+                "Header": accessHeader,
+                "Payload": accessPayload,
+                "Signature": accessSignature
+            }
+
+        else:
+
+            return {
+                "Token": None,
+                "Header": None,
+                "Payload": None,
+                "Signature": None
+            }
+
     def cleanupCache(self):
     
         databaseCursor = self.databaseConnection.cursor(buffered=True)
@@ -105,7 +131,8 @@ class Base:
                 
                 headers = {
                     "accept": "application/json",
-                    "X-Compatibility-Date": (compatibilityDate if compatibilityDate is not None else self.defaultCompatibilityDate)
+                    "X-Compatibility-Date": (compatibilityDate if compatibilityDate is not None else self.defaultCompatibilityDate),
+                    "X-User-Agent": self.userAgent
                 }
                 
                 if accessToken is not None:

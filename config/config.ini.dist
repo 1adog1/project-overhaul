@@ -1,38 +1,64 @@
 [Eve Authentication]
 ClientID =
+;When Using Environment Variables: ENV_OVERHAUL_EVE_CLIENT_ID - (REQUIRED)
 ClientSecret =
-ClientScopes =
+;When Using Environment Variables: ENV_OVERHAUL_EVE_CLIENT_SECRET - (REQUIRED)
+ClientScopes = esi-search.search_structures.v1
+;When Using Environment Variables: ENV_OVERHAUL_EVE_CLIENT_SCOPES - (DEFAULT "esi-search.search_structures.v1")
 ;Client Scopes is a string of space-separated scopes that the site requires to function. This site requires:
-;esi-search.search_structures.v1
+; esi-search.search_structures.v1
 DefaultScopes = esi-search.search_structures.v1
-;Default Scopes is a string a space-separated scopes required for the site's default login process. esi-search.search_structures.v1 is required for ESI search functionality.
+;When Using Environment Variables: ENV_OVERHAUL_EVE_DEFAULT_SCOPES - (DEFAULT "esi-search.search_structures.v1")
+;Default Scopes is a string a space-separated scopes required for the web app's default login process. 'esi-search.search_structures.v1' is required for ESI search functionality.
 ClientRedirect =
-;The callback is handled by the backend rather than a specific page. It MUST include the URL Parameter 'core_action=callback'.
+;When Using Environment Variables: ENV_OVERHAUL_EVE_CLIENT_REDIRECT - (REQUIRED)
+;The callback is handled by the backend rather than a specific page. It can be any page, but MUST include the URL Parameter 'core_action=callback'.
+ClientContactInfo = 
+;When Using Environment Variables: ENV_OVERHAUL_EVE_CLIENT_CONTACT_INFO - (REQUIRED)
+;This allows CCP to identify who's running the application. Use one of the following patterns:
+; foo@example.com
+; discord:username
+; eve:charactername
 AuthType = Neucore
-;Eve: Controls access by character, corporation, and alliance.
+;When Using Environment Variables: ENV_OVERHAUL_EVE_AUTH_TYPE - (DEFAULT "Neucore")
 ;Neucore: Uses Brave Neucore groups to control page access.
+;Eve: Controls access by character, corporation, and alliance.
 SuperAdmins =
-;Super Admins is a set of comma-separated character IDs in integer form. No comma is required for only one group name.
+;When Using Environment Variables: ENV_OVERHAUL_EVE_SUPER_ADMINS - (REQUIRED)
+;Super Admins is a set of comma-separated character IDs in integer form. No comma is required for only one id.
 
 [NeuCore Authentication]
 AppID =
+;When Using Environment Variables: ENV_OVERHAUL_NEUCORE_APP_ID - (REQUIRED WHEN USING NEUCORE)
 AppSecret =
+;When Using Environment Variables: ENV_OVERHAUL_NEUCORE_APP_SECRET - (REQUIRED WHEN USING NEUCORE)
 AppURL =
+;When Using Environment Variables: ENV_OVERHAUL_NEUCORE_APP_URL - (REQUIRED WHEN USING NEUCORE)
 ;Please include a trailing / in the URL; for example https://neucore.com/
 
 [Database]
 DatabaseServer = 127.0.0.1
+;When Using Environment Variables: ENV_OVERHAUL_DATABASE_SERVER - (REQUIRED)
 ;When using a MySQL Server on localhost you may need to use 127.0.0.1 instead for this variable.
 DatabasePort = 2580
+;When Using Environment Variables: ENV_OVERHAUL_DATABASE_PORT - (REQUIRED)
 DatabaseUsername =
+;When Using Environment Variables: ENV_OVERHAUL_DATABASE_USERNAME - (REQUIRED)
 DatabasePassword =
+;When Using Environment Variables: ENV_OVERHAUL_DATABASE_PASSWORD - (REQUIRED)
 DatabaseName =
+;When Using Environment Variables: ENV_OVERHAUL_DATABASE_NAME - (REQUIRED)
 ;This database will be created automatically on connection, it does not need to be created manually.
 
 [Website]
 AuthCookieName = AuthID
-SessionTime = 43200
+;When Using Environment Variables: ENV_OVERHAUL_WEBSITE_AUTH_COOKIE - (DEFAULT "AuthID")
+SessionTime = 86400
+;When Using Environment Variables: ENV_OVERHAUL_WEBSITE_SESSION_TIME - (DEFAULT "86400")
 ;Session Time is an integer of seconds after logging in that a character's session will be invalidated.
 AuthCacheTime = 0
+;When Using Environment Variables: ENV_OVERHAUL_WEBSITE_AUTH_CACHE_TIME - (DEFAULT "0")
 ;Auth Cache Time is an integer of seconds for which the outside data used to determine access roles is valid for.
-StoreVisitorIPs = false
+StoreVisitorIPs = 0
+;When Using Environment Variables: ENV_OVERHAUL_WEBSITE_STORE_IPS - (DEFAULT "0")
+;Evaluates using boolval, assuming input is a string.

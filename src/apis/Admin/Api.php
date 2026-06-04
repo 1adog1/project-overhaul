@@ -10,6 +10,7 @@
         private $databaseConnection;
         private $logger;
         private $configVariables;
+        private $versionVariables;
         private $characterStats;
         private $userAuthorization;
         private $esiHandler;
@@ -21,11 +22,13 @@
             $this->databaseConnection = $this->dependencies->get("Database");
             $this->logger = $this->dependencies->get("Logging");
             $this->configVariables = $this->dependencies->get("Configuration Variables");
+            $this->versionVariables = $this->dependencies->get("Version Variables");
             $this->characterStats = $this->dependencies->get("Character Stats");
             $this->userAuthorization = $this->dependencies->get("Authorization Control");
 
             $this->esiHandler = new \Ridley\Objects\ESI\Handler(
                 $this->databaseConnection,
+                $this->versionVariables,
                 $this->userAuthorization->getAccessToken("Default", $this->characterStats["Character ID"])
             );
 

@@ -23,12 +23,13 @@
         public function __construct(
             protected $authorizationLogger,
             protected $authorizationConnection,
-            protected $authorizationVariables
+            protected $authorizationVariables,
+            protected $authorizationVersionVariables
         ) {
 
-            $this->esiHandler = new \Ridley\Objects\ESI\Handler($authorizationConnection);
+            $this->esiHandler = new \Ridley\Objects\ESI\Handler($this->authorizationConnection, $this->authorizationVersionVariables);
 
-            $this->cookieName = $authorizationVariables["Auth Cookie Name"];
+            $this->cookieName = $this->authorizationVariables["Auth Cookie Name"];
 
             $neucoreToken = base64_encode($this->authorizationVariables["NeuCore ID"] . ":" . $this->authorizationVariables["NeuCore Secret"]);
             $this->neucoreAuthHeader = "Bearer " . $neucoreToken;
@@ -285,7 +286,7 @@
             $csrfBytes = random_bytes(16);
             $this->csrfToken = bin2hex($csrfBytes);
             $sessionExpiration = time() + $this->authorizationVariables["Session Time"];
-            setcookie($this->cookieName, $SessionID, ["expires" => $sessionExpiration, "path"=> "/", "samesite" => "Lax"]);
+            setcookie($this->cookieName, $SessionID, ["expires" => $sessionExpiration, "path"=> "/", "httponly" => true, "samesite" => "Lax"]);
 
             $convertedLoginStatus = (int)$this->isLoggedIn;
             $convertedAccessRoles = json_encode($this->accessRoles);

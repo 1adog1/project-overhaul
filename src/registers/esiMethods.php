@@ -21,6 +21,12 @@
     );
 
     $this->register(
+        endpoint: "/characters/{character_id}/location/",
+        method: "character_location",
+        requiredArguments: ["character_id"]
+    );
+
+    $this->register(
         endpoint: "/characters/{character_id}/search/",
         method: "authenticated_search",
         requiredArguments: ["character_id", "categories", "search"]

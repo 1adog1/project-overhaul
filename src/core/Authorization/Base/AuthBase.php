@@ -15,10 +15,11 @@
         public function __construct(
             protected $authorizationLogger,
             protected $authorizationConnection,
-            protected $authorizationVariables
+            protected $authorizationVariables,
+            protected $authorizationVersionVariables
         ) {
 
-            $this->esiHandler = new \Ridley\Objects\ESI\Handler($authorizationConnection);
+            $this->esiHandler = new \Ridley\Objects\ESI\Handler($this->authorizationConnection, $this->authorizationVersionVariables);
 
             $this->cleanupLogins();
 

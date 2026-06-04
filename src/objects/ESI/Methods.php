@@ -17,6 +17,17 @@
 
         }
 
+        protected function character_location(array $arguments) {
+
+            return $this->makeRequest(
+                endpoint: "/characters/{character_id}/location/",
+                url: $this->esiURL . "characters/" . $arguments["character_id"] . "/location/?datasource=tranquility",
+                accessToken: $this->accessToken,
+                retries: (isset($arguments["retries"]) ? $arguments["retries"] : 0)
+            );
+
+        }
+
         protected function authenticated_search(array $arguments) {
 
             $categories = implode(",", $arguments["categories"]);

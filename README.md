@@ -6,19 +6,27 @@ This framework features built-in user authentication and access control that can
 
 This framework is currently in Beta. It works, but much of the functionality is not yet documented.
 
-**Current Version: Stone – 1 – 0**
+**Current Version: Brick - 0 - 0**
 
 ## Requirements
 
 The core of this framework requires the following:
 
-* Apache ≥ 2.4
-  * The `DocumentRoot` config option to set `/public`
-  * The `FallbackResource` config option set to `/index.php`
-* PHP ≥ 8.0
+* A Web Server Such As:
+  * NGINX ≥ 1.18
+    * The `root` option pointing to the `/public` folder
+    * The `index` option set to `index.php`
+    * The `try_files` option set to `$uri /index.php$is_args$args`
+  * Apache ≥ 2.4
+    * The `DocumentRoot` config option set to `/public`
+    * The `FallbackResource` config option set to `/index.php`
+* PHP ≥ 8.1
   * The `curl` Built-In Extension
   * The `pdo_mysql` Built-In Extension
   * The `openssl` Built-In Extension
+* [When Using Python Components] Python ≥ 3.9
+  * [requests](https://pypi.org/project/requests/)
+  * [Python MySQL Connector](https://dev.mysql.com/downloads/connector/python/)
 * An SQL Server
   * If you are using MySQL, the Authentication Method **MUST** be the Legacy Version. PDO does not support the use of `caching_sha2_password` Authentication.
 * A Registered Eve Online Application with the `esi-search.search_structures.v1` scope.

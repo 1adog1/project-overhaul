@@ -7,7 +7,7 @@
     class Base {
 
         private $defaultSuccessCodes = ["200", "204"];
-        private $defaultCompatibilityDate = "2025-08-01";
+        private $defaultCompatibilityDate = "2026-06-01";
 
         private function hashRequest(string $url, string $method, ?array $payload, ?string $accessToken) {
 
@@ -15,10 +15,30 @@
                 "URL" => $url,
                 "Method" => $method,
                 "Payload" => $payload,
-                "Authentication" => $accessToken
+                "Subject" => $this->unpackAccessToken($accessToken)["Payload"]["sub"] ?? null
             ];
 
             return hash("sha256", json_encode($hashingArray, JSON_UNESCAPED_SLASHES));
+
+        }
+
+        private function unpackAccessToken(?string $accessToken) {
+
+            if (isset($accessToken)) {
+
+                $accessArray = explode(".", $accessToken);
+                $accessHeader = json_decode(base64_decode($accessArray[0]), true);
+                $accessPayload = json_decode(base64_decode($accessArray[1]), true);
+                $accessSignature = $accessArray[2];
+
+            }
+
+            return [
+                "Token" => $accessToken ?? null,
+                "Header" => $accessHeader ?? null,
+                "Payload" => $accessPayload ?? null,
+                "Signature" => $accessSignature ?? null
+            ];
 
         }
 
@@ -86,7 +106,8 @@
                     "ignore_errors" => true,
                     "header" => [
                         "accept: application/json",
-                        "X-Compatibility-Date: " . $compatibilityDateHeader
+                        "X-Compatibility-Date: " . $compatibilityDateHeader,
+                        "X-User-Agent: " . $this->userAgent
                     ],
                     "method" => $method
                 ]

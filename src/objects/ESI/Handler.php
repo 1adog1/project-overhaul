@@ -7,15 +7,45 @@
     class Handler extends Methods {
 
         protected $esiURL = "https://esi.evetech.net/";
+        protected $userAgent;
         protected $methodList = [];
 
         function __construct(
             protected $databaseConnection,
+            protected $versionVariables,
             protected $accessToken = null
         ) {
 
             require __DIR__ . "/../../registers/esiMethods.php";
+            $this->buildUserAgent();
 
+        }
+
+        private function buildUserAgent() {
+
+            if (!empty($this->versionVariables["App Name"])) {
+
+                $this->userAgent = (
+                    $this->versionVariables["App Name"] . "/" . $this->versionVariables["App Version"]
+                    . " (" . $this->versionVariables["Client Contact Info"] . "; +" . $this->versionVariables["App Github"] . ") "
+                    . "Project-Overhaul/" . $this->versionVariables["Overhaul Version"]
+                    . " (+" . $this->versionVariables["Overhaul Github"] . ")"
+                );
+
+            }
+            else {
+
+                $this->userAgent = (
+                    "Project-Overhaul/" . $this->versionVariables["Overhaul Version"]
+                    . " (" . $this->versionVariables["Client Contact Info"] . "; +" . $this->versionVariables["Overhaul Github"] . ") "
+                );
+
+            }
+
+        }
+
+        public function updateAccessToken(string $accessToken) {
+            $this->accessToken = $accessToken;
         }
 
         public function call(string $endpoint, mixed ...$arguments) {

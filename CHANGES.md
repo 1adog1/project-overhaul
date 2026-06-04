@@ -1,3 +1,34 @@
+# Major Version Update Brick - 0 - 0
+
+## Documentation
+- Updated various elements of `README.md`.
+- Added an `app_name` option to `VERSIONING`.
+- No more EM-Dash delimiters in `VERSIONING`, they cause problems with Python requests.
+
+## Config
+- Added support for Environment Variables.
+- Moved `VERSIONING` to `/config`.
+- `config/config.php` now builds version information from `VERSIONING`.
+- `Version Variables` are now exposed by the `DependencyManager`.
+- Added a `ClientContactInfo` config option which affects the ESI User Agent.
+- Created a new `OverhaulConfig` module for Python that loads common config and version data.
+
+## Security
+- Added the HttpOnly flag to session cookies.
+
+## ESI Handlers
+- `Ridley\Objects\ESI\Handler` and `ESI.Handler` now require a `versionVariables` parameter.
+    - Updated all existing objects across the framework.
+- The cache now uses a subject rather than access token as part of the key. 
+- Added methods to update an access token.
+- Added an ESI User Agent header.
+- Added the `/characters/{character_id}/location/` endpoint to `Ridley\Objects\ESI\Methods`.
+    - The framework does not require it, however it is helpful for testing that the PHP and Python ESI Handlers are consistent with each other.
+
+## Bugfixes
+- `config/config.php` now correctly parses into a multidimensional array.
+- Fixed several variable and method typos.
+
 # Minor Version Update Stone – 1 – 0
 
 ## Neucore Authentication
