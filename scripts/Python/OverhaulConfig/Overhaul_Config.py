@@ -151,9 +151,9 @@ class Config:
             )
 
             self.neucore_auth = NeucoreAuth(
-                AppID = os.environ["ENV_OVERHAUL_NEUCORE_APP_ID"] if "ENV_OVERHAUL_EVE_CLIENT_SCOPES" in os.environ else None, 
-                AppSecret = os.environ["ENV_OVERHAUL_NEUCORE_APP_SECRET"] if "ENV_OVERHAUL_EVE_CLIENT_SCOPES" in os.environ else None, 
-                AppURL = os.environ["ENV_OVERHAUL_NEUCORE_APP_URL"] if "ENV_OVERHAUL_EVE_CLIENT_SCOPES" in os.environ else None
+                AppID = os.environ["ENV_OVERHAUL_NEUCORE_APP_ID"] if "ENV_OVERHAUL_NEUCORE_APP_ID" in os.environ else None, 
+                AppSecret = os.environ["ENV_OVERHAUL_NEUCORE_APP_SECRET"] if "ENV_OVERHAUL_NEUCORE_APP_SECRET" in os.environ else None, 
+                AppURL = os.environ["ENV_OVERHAUL_NEUCORE_APP_URL"] if "ENV_OVERHAUL_NEUCORE_APP_URL" in os.environ else None
             )
 
         versioning_file = config_directory / "VERSIONING"
